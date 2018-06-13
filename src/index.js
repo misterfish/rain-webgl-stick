@@ -44,9 +44,9 @@ const then    = dot1 ('then')
 const recover = dot1 ('catch')
 const startP  = _ => Promise.resolve ()
 
-const { canvasSelector, textureSize, defaultWeather, weatherData, } = config
+const { textureSize, defaultWeather, weatherData, } = config
 
-export const go = () => startP ()
+export const go = canvas => startP ()
   | then (loadTextures)
   | then (([textureImgFg, textureImgBg, dropColor, dropAlpha]) => start ({
     textureImgFg,
@@ -54,7 +54,7 @@ export const go = () => startP ()
     dropColor,
     dropAlpha,
 
-    canvasSelector,
+    canvas,
   }))
   | recover (decorateException ('Quitting:') >> raise)
 
@@ -78,11 +78,11 @@ const start = (args) => new Promise ((res, rej) =>
   )
 )
 
-// --- xxx
-const _init = ({ textureImgFg, textureImgBg, dropColor, dropAlpha, canvasSelector, }) => {
+// --- xxx: width & height
+const _init = ({ textureImgFg, textureImgBg, dropColor, dropAlpha, canvas: _canvas, }) => {
   const dpi = window.devicePixelRatio
 
-  const canvas = document.querySelector(canvasSelector)
+  const canvas = _canvas
     | mergeM ({
         width: window.innerWidth * dpi,
         height: window.innerHeight * dpi,

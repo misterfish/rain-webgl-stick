@@ -1,2 +1,3 @@
 import { go } from './index'
-go ()
+
+global.rainGo = go

@@ -7,7 +7,6 @@ import {
 } from 'stick-js'
 
 export default {
-  canvasSelector: '#rain-canvas',
   textureSize: {
     bg: {
       width: 384,
