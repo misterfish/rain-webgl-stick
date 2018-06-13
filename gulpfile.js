@@ -23,14 +23,14 @@ function compileJS(file){
 gulp.task('default',['js1'],function(){});
 
 gulp.task('js1',function(){
-  compileJS('index');
+  compileJS('global');
 });
-gulp.task('js2',function(){
-  compileJS('index2');
-});
-gulp.task('js3',function(){
-  compileJS('index3');
-});
+// gulp.task('js2',function(){
+//   compileJS('index2');
+// });
+// gulp.task('js3',function(){
+//   compileJS('index3');
+// });
 
 
 
