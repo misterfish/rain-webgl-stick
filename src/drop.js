@@ -4,8 +4,8 @@ defineBinaryOperator ('>>', (...args) => composeRight (...args))
 
 import {
   pipe, compose, composeRight,
-    factory, factoryProps,
-} from 'stick'
+  factory, factoryProps,
+} from 'stick-js'
 
 // --- original code had these properties in the prototype: keeping it.
 

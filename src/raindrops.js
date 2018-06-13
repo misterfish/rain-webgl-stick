@@ -23,16 +23,17 @@ import {
   factory, factoryInit, factoryProps,
   mergeM,
   timesF,
-  // xxx
-  // assocM,
-  // divideBy,
+  assocM,
+  divideBy, multiply,
   notOk,
   appendToM,
   defaultTo,
   minus, plus,
   die,
   lets,
-} from 'stick'
+  dot1, dot2,
+  side, side4, side5,
+} from 'stick-js'
 
 const min = a => b => Math.min (a, b)
 const max = a => b => Math.max (a, b)
@@ -46,22 +47,6 @@ import {random, chance} from "./random"
 
 import Drop from './drop'
 import config from './config'
-
-export const divideBy = m => n => n / m
-export const multiply = x => y => x * y
-export const dot  = prop => o => o [prop] ()
-export const dot1 = prop => val1 => o => o [prop] (val1)
-export const dot2 = prop => val1 => val2 => o => o [prop] (val1, val2)
-export const dot3 = prop => val1 => val2 => val3 => o => o [prop] (val1, val2, val3)
-export const dot4 = prop => val1 => val2 => val3 => val4 => o => o [prop] (val1, val2, val3, val4)
-export const dot5 = prop => val1 => val2 => val3 => val4 => val5 => o => o [prop] (val1, val2, val3, val4, val5)
-
-export const side  = prop => o => (o [prop] (), o)
-export const side1 = prop => val1 => o => (o [prop] (val1), o)
-export const side2 = prop => val1 => val2 => o => (o [prop] (val1, val2), o)
-export const side3 = prop => val1 => val2 => val3 => o => (o [prop] (val1, val2, val3), o)
-export const side4 = prop => val1 => val2 => val3 => val4 => o => (o [prop] (val1, val2, val3, val4), o)
-export const side5 = prop => val1 => val2 => val3 => val4 => val5 => o => (o [prop] (val1, val2, val3, val4, val5), o)
 
 const dropSize = 64
 
@@ -110,9 +95,6 @@ const successive = (f) => (...args) => {
 
 const drawImage = side5 ('drawImage') | successive
 const getContext2d = dot1 ('getContext') ('2d')
-
-const assocMCapped = prop => val => o => (o[prop] = val, o)
-const assocM = assocMCapped
 
 const clearDroplets = getContext2d
   >> assocM ('fillStyle') ('#000')

@@ -1,3 +1,5 @@
+// --- original code.
+
 function loadImage(src,i,onLoad){
   return new Promise((resolve,reject)=>{
     if(typeof src=="string"){
@@ -35,7 +37,7 @@ export default function ImageLoader(images,onLoad){
           src:curImage.src,
         };
       })
-      
+
       resolve(r);
     });
   })

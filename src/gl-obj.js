@@ -4,20 +4,20 @@ defineBinaryOperator ('>>', (...args) => composeRight (...args))
 
 import {
   pipe, compose, composeRight,
-    ok, ifOk, ifTrue, ifFalse, ifYes, ifNo, ifPredicate, ifEmpty,
-    whenOk, whenTrue, whenFalse, whenYes, whenNo, whenPredicate, whenEmpty,
-    dot, dot1, dot2, nieuw, nieuw1, nieuw2,
-    cond, guard, otherwise,
-    sprintf1, sprintfN,
-    noop, doe, blush,
-    concatTo, concat, appendTo, append,
-    invoke, applyN, pass1,
-    compactOk, compact,
-    lt, gt, eq, ne, lte, gte,
+  ok, ifOk, ifTrue, ifFalse, ifYes, ifNo, ifPredicate, ifEmpty,
+  whenOk, whenTrue, whenFalse, whenYes, whenNo, whenPredicate, whenEmpty,
+  dot, dot1, dot2, nieuw, nieuw1, nieuw2,
+  cond, guard, otherwise,
+  sprintf1, sprintfN,
+  noop, doe, blush,
+  concatTo, concat, appendTo, append,
+  invoke, applyN, pass1,
+  compactOk, compact,
+  lt, gt, eq, ne, lte, gte,
   factory, factoryInit, factoryProps,
   side, side1, side2, side3, side4, side5,
   mergeM,
-} from 'stick'
+} from 'stick-js'
 
 import * as WebGL from "./webgl"
 

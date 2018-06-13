@@ -20,11 +20,11 @@ import {
   concatTo, concat, appendTo, append,
   concatToM, concatM, appendToM, appendM,
   merge, mergeTo, mergeM, mergeToM,
-  laat as lets, letS, compactOk, compact,
+  letS, compactOk, compact,
   lt, gt, eq, ne, lte, gte,
   factory, factoryProps,
   die, raise, decorateException, exception, tryCatch,
-} from 'stick'
+} from 'stick-js'
 
 const { log } = console
 const logWith = (header) => (...args) => log (... [header, ...args])
@@ -40,14 +40,13 @@ import config from './config'
 
 const create = dot1 ('create')
 const init   = side ('init')
-
-const { canvasSelector, textureSize, defaultWeather, weatherData, } = config
-
 const then    = dot1 ('then')
 const recover = dot1 ('catch')
 const startP  = _ => Promise.resolve ()
 
-const go = () => startP ()
+const { canvasSelector, textureSize, defaultWeather, weatherData, } = config
+
+export const go = () => startP ()
   | then (loadTextures)
   | then (([textureImgFg, textureImgBg, dropColor, dropAlpha]) => start ({
     textureImgFg,
@@ -79,6 +78,7 @@ const start = (args) => new Promise ((res, rej) =>
   )
 )
 
+// --- xxx
 const _init = ({ textureImgFg, textureImgBg, dropColor, dropAlpha, canvasSelector, }) => {
   const dpi = window.devicePixelRatio
 
@@ -165,4 +165,6 @@ const generateTexture = ([ctx, img, { width, height }, alpha]) => ctx
  | assocM ('globalAlpha', alpha)
  | side5 ('drawImage', img, 0, 0, width, height)
 
-go ()
+export default {
+    go,
+}

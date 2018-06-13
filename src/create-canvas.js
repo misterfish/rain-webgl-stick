@@ -4,8 +4,8 @@ defineBinaryOperator ('>>', (...args) => composeRight (...args))
 
 import {
   pipe, compose, composeRight,
-    mergeM,
-} from 'stick'
+  mergeM,
+} from 'stick-js'
 
 export default (width,height) =>
     document.createElement("canvas")

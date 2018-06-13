@@ -28,7 +28,7 @@
     "monet": "^0.8.10",
     "prelude-ls": "^1.1.2",
     "ramda": "^0.25.0",
-    "stick": "https://github.com/misterfish/stick.git",
+    "stick-js": "^0.0.37",
     "uglify-js": "^3.3.24",
     "vinyl-source-stream": "^2.0.0"
   }

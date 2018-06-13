@@ -4,7 +4,7 @@ defineBinaryOperator ('>>', (...args) => composeRight (...args))
 
 import {
   pipe, compose, composeRight,
-} from 'stick'
+} from 'stick-js'
 
 export default {
   canvasSelector: '#rain-canvas',
