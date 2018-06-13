@@ -13,6 +13,7 @@ import {
   sprintf1, sprintfN, rangeBy,
   noop, blush, always, T, F,
   prop, path, has, hasIn,
+  applyTo1, passToN,
   bindPropTo, bindProp, bindTo, bind,
   assoc, assocPath, update, updatePath,
   assocM, assocPathM, updateM, updatePathM,
@@ -26,7 +27,7 @@ import {
 } from 'stick'
 
 const { log } = console
-const logWith = header => (...args) => log (... [header, ...args])
+const logWith = (header) => (...args) => log (... [header, ...args])
 
 import 'core-js'
 import RainRenderer from "./rain-renderer"
@@ -37,26 +38,18 @@ import {random} from './random'
 
 import config from './config'
 
-const { canvasSelector, defaultWeather, weatherData, } = config
+const create = dot1 ('create')
+const init   = side ('init')
 
-let textureBgSize={
-  width:384,
-  height:256
-}
-let textureFgSize={
-  width:96,
-  height:64
-}
+const { canvasSelector, textureSize, defaultWeather, weatherData, } = config
 
-let raindrops, renderer
-
-const then = dot1 ('then')
+const then    = dot1 ('then')
 const recover = dot1 ('catch')
-const startP = _ => Promise.resolve ()
+const startP  = _ => Promise.resolve ()
 
 const go = () => startP ()
   | then (loadTextures)
-  | then (([textureImgFg, textureImgBg, dropColor, dropAlpha]) => init ({
+  | then (([textureImgFg, textureImgBg, dropColor, dropAlpha]) => start ({
     textureImgFg,
     textureImgBg,
     dropColor,
@@ -78,7 +71,7 @@ const loadTextures = _ => loadImages ([
   ])
   | recover (decorateException ('Error loading texture images:') >> raise)
 
-const init = (args) => new Promise ((res, rej) =>
+const start = (args) => new Promise ((res, rej) =>
   (_ => _init (args))
   | tryCatch (
     res,
@@ -98,53 +91,60 @@ const _init = ({ textureImgFg, textureImgBg, dropColor, dropAlpha, canvasSelecto
         width: window.innerWidth + "px",
         height: window.innerHeight + "px",
       })
+
     )
-  | tap (logWith ('sss'))
 
-  raindrops = Raindrops.create ({
-    dropAlpha,
-    dropColor,
-    width: canvas.width,
-    height: canvas.height,
-    scale: dpi,
-    options: {
-      trailRate: 1,
-      trailScaleRange: [0.2, 0.45],
-      collisionRadius: 0.45,
-      dropletsCleaningRadiusMultiplier: 0.28,
-    },
-  }).init ()
+  const raindrops = Raindrops
+    | create ({
+        dropAlpha,
+        dropColor,
+        width: canvas.width,
+        height: canvas.height,
+        scale: dpi,
+        options: {
+          trailRate: 1,
+          trailScaleRange: [0.2, 0.45],
+          collisionRadius: 0.45,
+          dropletsCleaningRadiusMultiplier: 0.28,
+        },
+    })
+    | init
 
-  const textureFg = createCanvas (textureFgSize.width,textureFgSize.height)
-  const textureFgCtx = textureFg.getContext ('2d')
-  const textureBg = createCanvas (textureBgSize.width,textureBgSize.height)
-  const textureBgCtx = textureBg.getContext ('2d')
+  const getTexInfo = (() => {
+    const get = letS ([
+      ({ width, height, }) => createCanvas (width, height),
+      (_, texture)         => texture.getContext ('2d'),
+      (_, texture, ctx)    => [texture, ctx],
+    ])
+
+    return prop >> applyTo1 (textureSize) >> get
+  }) ()
+
+  const [textureFg, textureFgCtx] = getTexInfo ('fg')
+  const [textureBg, textureBgCtx] = getTexInfo ('bg')
 
   ; [
-    [textureFgCtx, textureImgFg, textureFgSize, 1],
-    [textureBgCtx, textureImgBg, textureBgSize, 1],
+    [textureFgCtx, textureImgFg, textureSize ['fg'], 1],
+    [textureBgCtx, textureImgBg, textureSize ['bg'], 1],
   ] | map (generateTexture)
 
-  renderer = RainRenderer.create ({
-    canvas,
-    imageFg: textureFg,
-    imageBg: textureBg,
-    canvasLiquid: raindrops.canvas,
-    optionsArg: {
-      brightness:1.04,
-      alphaMultiply:6,
-      alphaSubtract:3,
-      // minRefraction:256,
-      // maxRefraction:512
-    }
-  })
-  renderer = renderer.init ()
+  RainRenderer
+    | create ({
+      canvas,
+      imageFg: textureFg,
+      imageBg: textureBg,
+      canvasLiquid: raindrops.canvas,
+      optionsArg: {
+        brightness:1.04,
+        alphaMultiply:6,
+        alphaSubtract:3,
+        // minRefraction:256,
+        // maxRefraction:512
+      }
+    })
+    | init
 
-  setupWeather (textureImgFg, textureImgBg)
-}
-
-const setupWeather = (fg, bg) => {
-  updateWeather ('rain', fg, bg)
+  updateWeather ('rain', textureImgFg, textureImgBg, raindrops)
 }
 
 const weather = (fg, bg) => (data) => Object.assign (
@@ -154,16 +154,15 @@ const weather = (fg, bg) => (data) => Object.assign (
   { fg, bg },
 )
 
-const updateWeather = (currentSlide, fg, bg) => {
-  const data = weatherData[currentSlide] | weather (fg, bg)
+const updateWeather = (currentSlide, fg, bg, raindrops) => {
+  const data = weatherData [currentSlide] | weather (fg, bg)
 
   raindrops.options | mergeM (data)
   raindrops.clearDrops ()
 }
 
 const generateTexture = ([ctx, img, { width, height }, alpha]) => ctx
-  // --- xxx new versions
  | assocM ('globalAlpha', alpha)
- | side5 ('drawImage') (img, 0, 0, width, height)
+ | side5 ('drawImage', img, 0, 0, width, height)
 
 go ()

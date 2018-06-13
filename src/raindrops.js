@@ -2,9 +2,6 @@ defineBinaryOperator ('|',  (...args) => pipe         (...args))
 defineBinaryOperator ('<<', (...args) => compose      (...args))
 defineBinaryOperator ('>>', (...args) => composeRight (...args))
 
-window.CREATEDROP = 0
-window.UPDATERAIN = 0
-
 import ramda, {
   curry, clamp,
 } from 'ramda'
@@ -13,20 +10,18 @@ import {
   pipe, compose, composeRight,
   tap,
   each, addIndex,
-    ok, ifOk, ifTrue, ifFalse, ifYes, ifNo, ifPredicate, ifEmpty,
-    whenOk, whenTrue, whenFalse, whenYes, whenNo, whenPredicate, whenEmpty,
-  // dot, dot1, dot2,
-    nieuw, nieuw1, nieuw2,
-    guard, otherwise,
-    sprintf1, sprintfN, rangeBy,
-    noop, doe, blush,
-    concatTo, concat, appendTo, append,
-    invoke, applyN, pass1,
-    compactOk, compact,
-    lt, gt, eq, ne, lte, gte,
+  ok, ifOk, ifTrue, ifFalse, ifYes, ifNo, ifPredicate, ifEmpty,
+  whenOk, whenTrue, whenFalse, whenYes, whenNo, whenPredicate, whenEmpty,
+  nieuw, nieuw1, nieuw2,
+  guard, otherwise,
+  sprintf1, sprintfN, rangeBy,
+  noop, doe, blush,
+  concatTo, concat, appendTo, append,
+  invoke, applyN, pass1,
+  compactOk, compact,
+  lt, gt, eq, ne, lte, gte,
   factory, factoryInit, factoryProps,
   mergeM,
-  // side, side1, side2, side3, side4, side5,
   timesF,
   // xxx
   // assocM,
@@ -67,9 +62,6 @@ export const side2 = prop => val1 => val2 => o => (o [prop] (val1, val2), o)
 export const side3 = prop => val1 => val2 => val3 => o => (o [prop] (val1, val2, val3), o)
 export const side4 = prop => val1 => val2 => val3 => val4 => o => (o [prop] (val1, val2, val3, val4), o)
 export const side5 = prop => val1 => val2 => val3 => val4 => val5 => o => (o [prop] (val1, val2, val3, val4, val5), o)
-
-const { log, } = console
-const logWith = header => (...args) => log (... [header, ...args])
 
 const dropSize = 64
 
@@ -316,8 +308,6 @@ const proto = {
   },
 
   createDrop (options) {
-    if (! (++window.CREATEDROP % 1000))
-      console.log ('createDrop() has been called', window.CREATEDROP, 'times')
     if (this.haveMaxDrops ()) return
     return Drop.create (options)
   },
