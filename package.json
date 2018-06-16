@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "axios": "^0.17.1",
     "babel": "^6.23.0",
     "babel-cli": "^6.26.0",
     "babel-eslint": "^8.2.3",
