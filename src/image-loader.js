@@ -1,4 +1,4 @@
-// --- original code.
+// --- original code, + timeout
 
 function loadImage(src,i,onLoad){
   return new Promise((resolve,reject)=>{
@@ -11,10 +11,19 @@ function loadImage(src,i,onLoad){
 
     let img=new Image();
     src.img=img;
+
+    const job = setTimeout (
+      _ => reject ('Timed out loading img: ' + src.src),
+      2000,
+    )
+
     img.addEventListener("load",(event)=>{
       if(typeof onLoad=="function"){
         onLoad.call(null,img,i);
       }
+
+      clearTimeout (job)
+
       resolve(src);
     });
     img.src=src.src;
