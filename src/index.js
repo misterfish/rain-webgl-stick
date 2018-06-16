@@ -1,3 +1,5 @@
+const LEGACY = false
+
 defineBinaryOperator ('|',  (...args) => pipe         (...args))
 defineBinaryOperator ('<<', (...args) => compose      (...args))
 defineBinaryOperator ('>>', (...args) => composeRight (...args))
@@ -24,12 +26,11 @@ import {
   lt, gt, eq, ne, lte, gte,
   factory, factoryProps,
   die, raise, decorateException, exception, tryCatch,
+  invoke,
 } from 'stick-js'
 
-const { log } = console
-const logWith = (header) => (...args) => log (... [header, ...args])
-
 import 'core-js'
+
 import RainRenderer from "./rain-renderer"
 import Raindrops from "./raindrops"
 import loadImages from "./image-loader"
@@ -37,6 +38,8 @@ import createCanvas from "./create-canvas"
 import {random} from './random'
 
 import config from './config'
+
+import { allP, axiosGet, } from './util'
 
 const create = dot1 ('create')
 const init   = side ('init')
@@ -46,9 +49,16 @@ const startP  = _ => Promise.resolve ()
 
 const { textureSize, defaultWeather, weatherData, } = config
 
+const loadShadersAndTextures = _ => [loadShaders (), loadTextures ()]
+  | allP
+  | recover (decorateException ("Can't load shaders and/or textures") >> raise)
+
 export const go = canvas => startP ()
-  | then (loadTextures)
-  | then (([textureImgFg, textureImgBg, dropColor, dropAlpha]) => start ({
+  | then (loadShadersAndTextures)
+  | then (([[vertShader, fragShader], [textureImgFg, textureImgBg, dropColor, dropAlpha]]) => start ({
+    vertShader,
+    fragShader,
+
     textureImgFg,
     textureImgBg,
     dropColor,
@@ -58,28 +68,60 @@ export const go = canvas => startP ()
   }))
   | recover (decorateException ('Quitting:') >> raise)
 
-const loadTextures = _ => loadImages ([
-    { name:"dropAlpha", src:"img/drop-alpha.png" },
-    { name:"dropColor", src:"img/drop-color.png" },
+const images = {
+  dropAlpha: require ('images/rain/drop-alpha.png'),
+  dropColor: require ('images/rain/drop-color.png'),
+  textureFg: require ('images/rain/fritz-60s.png'),
+  textureBg: require ('images/rain/fritz-60s.png'),
+}
+
+const vertShaderLoc = require ('./shaders/simple.vert.shader')
+const fragShaderLoc = require ('./shaders/water.frag.shader')
+
+const loadShadersLegacy = _ => {
+  const requireShaderScript = require ('glslify')
+
+  const vertShader = requireShaderScript ('./shaders/simple.vert.shader')
+  const fragShader = requireShaderScript ('./shaders/water.frag.shader')
+
+  return startP ()
+  | then ([vertShader, fragShader] | always)
+}
+
+const loadShadersWebpack = _ => [vertShaderLoc, fragShaderLoc]
+  | map (axiosGet)
+  | allP
+  | then (map (prop ('data')))
+  | recover (decorateException ('Error loading shaders:') >> raise)
+
+const loadShaders = LEGACY ? loadShadersLegacy : loadShadersWebpack
+
+const loadTextures = _ => {
+  return loadImages ([
+    { name:"dropAlpha", src: images.dropAlpha },
+    { name:"dropColor", src: images.dropColor },
     // --- 'fg' is the image which will be reflected in the droplets.
-    { name:"textureFg", src:"img/fritz-60s.png" },
-    { name:"textureBg", src:"img/fritz-60s.png" },
+    { name:"textureFg", src: images.textureFg },
+    { name:"textureBg", src: images.textureBg },
   ])
   | then (({ textureFg, textureBg, dropColor, dropAlpha, }) => [
     textureFg.img, textureBg.img, dropColor.img, dropAlpha.img,
   ])
   | recover (decorateException ('Error loading texture images:') >> raise)
+}
 
-const start = (args) => new Promise ((res, rej) =>
+// --- xxx ugly
+const start = (args) => {
+  return new Promise ((res, rej) =>
   (_ => _init (args))
   | tryCatch (
     res,
     decorateException ('Error on init:') >> rej,
   )
-)
+)}
 
 // --- xxx: width & height
-const _init = ({ textureImgFg, textureImgBg, dropColor, dropAlpha, canvas: _canvas, }) => {
+const _init = ({ vertShader, fragShader, textureImgFg, textureImgBg, dropColor, dropAlpha, canvas: _canvas, }) => {
   const dpi = window.devicePixelRatio
 
   const canvas = _canvas
@@ -131,6 +173,8 @@ const _init = ({ textureImgFg, textureImgBg, dropColor, dropAlpha, canvas: _canv
   RainRenderer
     | create ({
       canvas,
+      vertShader,
+      fragShader,
       imageFg: textureFg,
       imageBg: textureBg,
       canvasLiquid: raindrops.canvas,

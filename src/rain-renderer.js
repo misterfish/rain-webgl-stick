@@ -38,11 +38,6 @@ import createCanvas from "./create-canvas"
 const eachX = addIndex (each)
 const _draw = side ('_draw')
 
-const requireShaderScript = require ('glslify')
-
-const vertShader = requireShaderScript ('./shaders/simple.vert')
-const fragShader = requireShaderScript ('./shaders/water.frag')
-
 const defaultOptions = {
   renderShadow: false,
   minRefraction: 256,
@@ -66,6 +61,8 @@ const instance = {
   width: 0,
   height: 0,
   textures: void 8,
+  vertShader: void 8,
+  fragShader: void 8,
   programWater: void 8,
   parallaxX: 0,
   parallaxY: 0,
@@ -73,10 +70,9 @@ const instance = {
   options: void 8,
 }
 
-// --- xxx vertShader and fragShader are not instance vars
 const proto = {
   init () {
-    const { optionsArg, canvas, } = this
+    const { optionsArg, canvas, vertShader, fragShader, } = this
     this | mergeM ({
       options: Object.assign ({}, defaultOptions, optionsArg),
       width: canvas.width,
