@@ -1,3 +1,5 @@
+// --- xxx legacy build is currently broken: image paths need to be handled properly.
+
 const LEGACY = false
 
 defineBinaryOperator ('|',  (...args) => pipe         (...args))
