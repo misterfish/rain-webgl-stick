@@ -11,7 +11,7 @@ import {
   map, filter, reject, reduce, flip, flip3,
   join, split, last, head, tail,
   dot, dot1, dot2, side, side1, side2, side5,
-  cond, condS, guard, guardV, otherwise,
+  condS, guard, guardV, otherwise,
   sprintf1, sprintfN, rangeBy,
   noop, blush, always, T, F,
   prop, path, has, hasIn,
@@ -46,6 +46,7 @@ const init   = side ('init')
 const then    = dot1 ('then')
 const recover = dot1 ('catch')
 const startP  = _ => Promise.resolve ()
+const resolveP = (...args) => Promise.resolve (...args)
 
 const { textureSize, defaultWeather, weatherData, } = config
 
@@ -110,38 +111,32 @@ const loadTextures = _ => {
   | recover (decorateException ('Error loading texture images:') >> raise)
 }
 
-// --- xxx ugly
-const start = (args) => {
-  return new Promise ((res, rej) =>
-  (_ => _init (args))
-  | tryCatch (
-    res,
-    decorateException ('Error on init:') >> rej,
-  )
-)}
+const setWidthAndHeight = id | always
+const legacySetWidthAndHeight = dpi => mergeM ({
+      width: window.innerWidth * dpi,
+      height: window.innerHeight * dpi,
+  })
+  >> tap (prop ('style') >> mergeM ({
+      width: window.innerWidth + "px",
+      height: window.innerHeight + "px",
+  }))
+
+const start = (...args) => resolveP (...args)
+  | then (_start)
+  | recover (decorateException ('Error on init:') >> raise)
 
 // --- xxx: width & height
-const _init = ({ vertShader, fragShader, textureImgFg, textureImgBg, dropColor, dropAlpha, canvas: _canvas, }) => {
+const _start = ({ vertShader, fragShader, textureImgFg, textureImgBg, dropColor, dropAlpha, canvas: _canvas, }) => {
   const dpi = window.devicePixelRatio
 
-  const canvas = _canvas
-    | mergeM ({
-        width: window.innerWidth * dpi,
-        height: window.innerHeight * dpi,
-    })
-    | tap (prop ('style') >> mergeM ({
-        width: window.innerWidth + "px",
-        height: window.innerHeight + "px",
-      })
-
-    )
-
+  const canvas = _canvas | setWidthAndHeight (dpi)
+  const rect = _canvas.getBoundingClientRect ()
   const raindrops = Raindrops
     | create ({
         dropAlpha,
         dropColor,
-        width: canvas.width,
-        height: canvas.height,
+        width: rect.width,
+        height: rect.height,
         scale: dpi,
         options: {
           trailRate: 1,

@@ -7,7 +7,7 @@ import {
   ok, ifOk, ifTrue, ifFalse, ifYes, ifNo, ifPredicate, ifEmpty,
   whenOk, whenTrue, whenFalse, whenYes, whenNo, whenPredicate, whenEmpty,
   dot, dot1, dot2, nieuw, nieuw1, nieuw2,
-  cond, guard, otherwise,
+  guard, otherwise,
   sprintf1, sprintfN,
   noop, doe, blush,
   concatTo, concat, appendTo, append,
