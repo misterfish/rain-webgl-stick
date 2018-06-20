@@ -33,6 +33,7 @@ import {
   lets,
   dot1, dot2,
   side, side4, side5,
+  merge,
 } from 'stick-js'
 
 const min = a => b => Math.min (a, b)
@@ -157,7 +158,7 @@ const props = {
 const proto = {
   init () {
     const { optionsArg, width, height, dropletsPixelDensity, } = this
-    this.options = Object.assign ({}, defaultRaindrops, optionsArg)
+    this.options = defaultRaindrops | merge (optionsArg)
     const canvas = createCanvas (width, height)
     const droplets = createCanvas (width * dropletsPixelDensity, height * dropletsPixelDensity)
     return this | mergeM ({

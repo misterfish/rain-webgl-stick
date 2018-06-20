@@ -17,7 +17,7 @@ import {
   factory, factoryInit, factoryProps,
   side, side1, side2, side3, side4, side5,
   assocM,
-  mergeM,
+  mergeM, merge,
   addIndex, each, id,
 } from 'stick-js'
 
@@ -74,7 +74,7 @@ const proto = {
   init () {
     const { optionsArg, canvas, vertShader, fragShader, } = this
     this | mergeM ({
-      options: Object.assign ({}, defaultOptions, optionsArg),
+      options: defaultOptions | merge (optionsArg),
       width: canvas.width,
       height: canvas.height,
       gl: GL.create ({

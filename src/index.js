@@ -186,12 +186,9 @@ const _start = ({ vertShader, fragShader, textureImgFg, textureImgBg, dropColor,
   updateWeather ('rain', textureImgFg, textureImgBg, raindrops)
 }
 
-const weather = (fg, bg) => (data) => Object.assign (
-  {},
-  defaultWeather,
-  data,
-  { fg, bg },
-)
+const weather = (fg, bg) => (data) => defaultWeather
+  | merge (data)
+  | mergeM ({ fg, bg, })
 
 const updateWeather = (currentSlide, fg, bg, raindrops) => {
   const data = weatherData [currentSlide] | weather (fg, bg)
