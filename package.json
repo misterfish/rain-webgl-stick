@@ -27,7 +27,6 @@
     "gulp-uglify": "^3.0.0",
     "memoize-immutable": "^3.0.0",
     "monet": "^0.8.10",
-    "prelude-ls": "^1.1.2",
     "ramda": "^0.25.0",
     "stick-js": "^0.0.37",
     "uglify-js": "^3.3.24",

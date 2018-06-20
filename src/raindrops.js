@@ -78,7 +78,6 @@ const sqrt = Math.sqrt
 const slice = dot2 ('slice')
 
 const eachX = each | addIndex
-const defaultToA = blush >> defaultTo
 const updateM = curry ((prop, f, o) => (o [prop] = o [prop] | f, o))
 
 const beginPath = side ('beginPath')
