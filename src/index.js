@@ -56,9 +56,11 @@ const loadShadersAndTextures = _ => [loadShaders (), loadTextures ()]
   | allP
   | recover (decorateException ("Can't load shaders and/or textures") >> raise)
 
-export const go = canvas => startP ()
+export const go = (canvas, weatherConfig = {}) => startP ()
   | then (loadShadersAndTextures)
   | then (([[vertShader, fragShader], [textureImgFg, textureImgBg, dropColor, dropAlpha]]) => start ({
+    weatherConfig,
+
     vertShader,
     fragShader,
 
@@ -136,7 +138,7 @@ const start = (...args) => resolveP (...args)
   | then (_start)
   | recover (decorateException ('Error on init:') >> raise)
 
-const _start = ({ vertShader, fragShader, textureImgFg, textureImgBg, dropColor, dropAlpha, canvas: _canvas, }) => {
+const _start = ({ weatherConfig, vertShader, fragShader, textureImgFg, textureImgBg, dropColor, dropAlpha, canvas: _canvas, }) => {
   const dpi = window.devicePixelRatio
 
   const canvas = _canvas | setWidthAndHeight (dpi)
@@ -193,15 +195,15 @@ const _start = ({ vertShader, fragShader, textureImgFg, textureImgBg, dropColor,
     })
     | init
 
-  updateWeather ('rain', textureImgFg, textureImgBg, raindrops)
+  updateWeather (weatherConfig, textureImgFg, textureImgBg, raindrops)
 }
 
 const weather = (fg, bg) => (data) => defaultWeather
   | merge (data)
   | mergeM ({ fg, bg, })
 
-const updateWeather = (currentSlide, fg, bg, raindrops) => {
-  const data = weatherData [currentSlide] | weather (fg, bg)
+const updateWeather = (weatherConfig, fg, bg, raindrops) => {
+  const data = weatherConfig | weather (fg, bg)
 
   raindrops.options | mergeM (data)
   raindrops.clearDrops ()

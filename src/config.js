@@ -32,47 +32,6 @@ export default {
     flashChance: 0,
     collisionRadiusIncrease: 0.0002,
   },
-  weatherData:  {
-    rain: {
-      rainChance: 0.35,
-      dropletsRate: 50,
-      raining: true,
-      // trailRate: 2.5,
-    },
-    storm: {
-      maxR: 55,
-      rainChance: 0.4,
-      dropletsRate: 80,
-      dropletsSize: [3,5.5],
-      trailRate: 2.5,
-      trailScaleRange: [0.25,0.4],
-//       flashFg: textureStormLightningFg,
-//       flashBg: textureStormLightningBg,
-//       flashChance: 0.1
-    },
-    fallout: {
-      minR: 30,
-      maxR: 60,
-      rainChance: 0.35,
-      dropletsRate: 20,
-      trailRate: 4,
-      collisionRadiusIncrease: 0
-    },
-    drizzle: {
-      minR: 10,
-      maxR: 40,
-      rainChance: 0.15,
-      rainLimit: 2,
-      dropletsRate: 10,
-      dropletsSize: [3.5,6],
-    },
-    sunny: {
-      rainChance: 0,
-      rainLimit: 0,
-      droplets: 0,
-      raining: false,
-    },
-  },
   defaultRaindrops:  {
     minR: 10,
     maxR: 40,
