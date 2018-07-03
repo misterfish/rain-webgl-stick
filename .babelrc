@@ -1,0 +1,9 @@
+{"presets": ["babel-preset-env", "stage-0"], "plugins": [
+    "babel-plugin-operator-overload",
+    // --- useBuiltIns = use Object.assign directly.
+    ["transform-object-rest-spread", { "useBuiltIns": true }],
+    ["transform-runtime", {
+        "polyfill": false,
+        "regenerator": true
+    }]
+]}

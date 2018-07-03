@@ -1,6 +1,6 @@
 // --- xxx legacy build is currently broken: image paths need to be handled properly.
 
-const LEGACY = false
+const LEGACY = true
 
 defineBinaryOperator ('|',  (...args) => pipe         (...args))
 defineBinaryOperator ('<<', (...args) => compose      (...args))
@@ -71,33 +71,42 @@ export const go = canvas => startP ()
   }))
   | recover (decorateException ('Quitting:') >> raise)
 
+const imagePath = LEGACY ? 'img' : 'images/rain'
+
 const images = {
-  dropAlpha: require ('images/rain/drop-alpha.png'),
-  dropColor: require ('images/rain/drop-color.png'),
-  textureFg: require ('images/rain/fritz-60s.png'),
-  textureBg: require ('images/rain/fritz-60s.png'),
+    // dropAlpha: require (imagePath + '/drop-alpha.png'),
+    // dropColor: require (imagePath + '/drop-color.png'),
+    // textureFg: require (imagePath + '/fritz-60s.png'),
+    // textureBg: require (imagePath + '/fritz-60s.png'),
+  dropAlpha: imagePath + '/drop-alpha.png',
+  dropColor: imagePath + '/drop-color.png',
+  textureFg: imagePath + '/fritz-60s.png',
+  textureBg: imagePath + '/fritz-60s.png',
 }
 
-const vertShaderLoc = require ('./shaders/simple.vert.shader')
-const fragShaderLoc = require ('./shaders/water.frag.shader')
+const vertShaderLoc = require ('./shaders/simple.vert.shader.js')
+const fragShaderLoc = require ('./shaders/water.frag.shader.js')
 
-const loadShadersLegacy = _ => {
-  const requireShaderScript = require ('glslify')
+// const loadShadersLegacy = _ => {
+//   const vertShader = require (vertShaderLoc)
+//   const fragShader = require (fragShaderLoc)
+//
+//   return startP ()
+//   | then ([vertShader, fragShader] | always)
+// }
 
-  const vertShader = requireShaderScript ('./shaders/simple.vert.shader')
-  const fragShader = requireShaderScript ('./shaders/water.frag.shader')
-
-  return startP ()
-  | then ([vertShader, fragShader] | always)
-}
-
-const loadShadersWebpack = _ => [vertShaderLoc, fragShaderLoc]
+const loadShadersWebpackHTTP = _ => [vertShaderLoc, fragShaderLoc]
   | map (axiosGet)
   | allP
   | then (map (prop ('data')))
   | recover (decorateException ('Error loading shaders:') >> raise)
 
-const loadShaders = LEGACY ? loadShadersLegacy : loadShadersWebpack
+const loadShadersWebpack = _ => resolveP ([
+  vertShaderLoc.default, fragShaderLoc.default,
+])
+
+// const loadShaders = LEGACY ? loadShadersLegacy : loadShadersWebpack
+const loadShaders = loadShadersWebpack
 
 const loadTextures = _ => {
   return loadImages ([
@@ -127,7 +136,6 @@ const start = (...args) => resolveP (...args)
   | then (_start)
   | recover (decorateException ('Error on init:') >> raise)
 
-// --- xxx: width & height
 const _start = ({ vertShader, fragShader, textureImgFg, textureImgBg, dropColor, dropAlpha, canvas: _canvas, }) => {
   const dpi = window.devicePixelRatio
 

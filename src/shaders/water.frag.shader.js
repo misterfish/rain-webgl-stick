@@ -1,3 +1,4 @@
+export default `
 precision mediump float;
 
 // textures
@@ -123,3 +124,4 @@ void main() {
 
   gl_FragColor = blend(bg,fg);
 }
+`
